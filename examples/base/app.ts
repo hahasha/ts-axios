@@ -119,3 +119,15 @@ axios({
 }).then((res) => {
   console.log(res)
 })
+
+axios({
+  method: 'post',
+  url: '/base/post',
+  data: {
+    a: 1,
+    b: 2
+  },
+  responseType: 'json'
+}).then((res) => {
+  console.log(res)
+})
