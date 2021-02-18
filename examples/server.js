@@ -9,18 +9,6 @@ const app = express()
 const compiler = webpack(webpackConfig)
 const router = express.Router()
 
-router.get('/simple/get', function (req, res) {
-  res.json({
-    msg: 'hello world'
-  })
-})
-
-router.get('/base/get', function (req, res) {
-  res.json(req.query)
-})
-
-app.use(router)
-
 app.use(webpackDevMiddleware(compiler, {
   publicPath: '/__build__/',
   stats: {
@@ -35,6 +23,36 @@ app.use(express.static(__dirname))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) // 表示使用第三方模块qs来处理
+
+// 路由配置
+router.get('/simple/get', function (req, res) {
+  res.json({
+    msg: 'hello world'
+  })
+})
+
+router.get('/base/get', function (req, res) {
+  res.json(req.query)
+})
+
+router.post('/base/post', function (req, res) {
+  res.json(req.body)
+})
+
+router.post('/base/buffer', function (req, res) {
+  let msg = []
+  req.on('data', (chunk) => {
+    if (chunk) {
+      msg.push(chunk)
+    }
+  })
+  req.on('end', () => {
+    let buf = Buffer.concat(msg)
+    res.json(buf.toJSON())
+  })
+})
+
+app.use(router)
 
 const port = process.env.PORT || 8080
 module.exports = app.listen(port, () => {
