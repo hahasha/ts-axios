@@ -114,6 +114,10 @@ router.get('/interceptor/get', function (req, res) {
   res.end('hello')
 })
 
+router.post('/config/post', function(req, res) {
+  res.json('hello')
+})
+
 app.use(router)
 
 const port = process.env.PORT || 3000
