@@ -4,7 +4,16 @@ import { createError } from '../helpers/error'
 
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
-    const { method = 'get', url, data = null, headers, responseType, timeout } = config
+    const {
+      method = 'get',
+      url,
+      data = null,
+      headers,
+      responseType,
+      timeout,
+      cancelToken,
+      withCredentials
+    } = config
     const request = new XMLHttpRequest()
 
     if (responseType) {
@@ -12,6 +21,15 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     }
     if (timeout) {
       request.timeout = timeout
+    }
+    if (cancelToken) {
+      cancelToken.promise.then(reason => {
+        request.abort()
+        reject(reason)
+      })
+    }
+    if (withCredentials) {
+      request.withCredentials = withCredentials
     }
 
     request.onreadystatechange = function handleLoad() {
@@ -63,7 +81,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       }
     }
 
-    request.open(method.toUpperCase(), url, true)
+    request.open(method.toUpperCase(), url!, true)
 
     Object.keys(headers).forEach(name => {
       if (data === null && name.toLocaleLowerCase() === 'content-type') {
