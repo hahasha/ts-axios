@@ -41,3 +41,27 @@ export function deepMerge(...objs: any[]): any {
 
   return result
 }
+
+interface URLOrigin {
+  protocal: string
+  host: string
+}
+
+const urlParsingNode = document.createElement('a')
+const currentOrigin = resolveURL(window.location.href)
+
+function resolveURL(url: string): URLOrigin {
+  urlParsingNode.setAttribute('href', url)
+  const { protocal, host } = urlParsingNode
+  return {
+    protocal,
+    host
+  }
+}
+
+export function isUrlSameOrigin(requestURL: string): boolean {
+  const parsedOrigin = resolveURL(requestURL)
+  return (
+    parsedOrigin.protocal === currentOrigin.protocal && parsedOrigin.host === currentOrigin.host
+  )
+}

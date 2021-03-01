@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 const webpack = require('webpack')
 const webpackDevMiddleware = require('webpack-dev-middleware')
 const webpackHotMiddleware = require('webpack-hot-middleware')
@@ -19,10 +20,16 @@ app.use(webpackDevMiddleware(compiler, {
 
 app.use(webpackHotMiddleware(compiler))
 
-app.use(express.static(__dirname))
+app.use(express.static(__dirname, {
+  setHeaders(res) {
+    res.cookie('XSRF-TOKEN-D', '1234abc')
+  }
+}))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) // 表示使用第三方模块qs来处理
+app.use(cookieParser())
+
 
 // 路由配置
 router.get('/simple/get', function (req, res) {
@@ -114,24 +121,24 @@ router.get('/interceptor/get', function (req, res) {
   res.end('hello')
 })
 
-router.post('/config/post', function(req, res) {
+router.post('/config/post', function (req, res) {
   res.json('hello')
 })
 
-router.get('/cancel/get', function(req, res) {
+router.get('/cancel/get', function (req, res) {
   setTimeout(() => {
     res.json('hello')
   }, 1000)
 })
 
-router.post('/cancel/post', function(req, res) {
+router.post('/cancel/post', function (req, res) {
   setTimeout(() => {
     res.json(req.body)
   }, 1000)
 })
 
-router.get('/more/get', function(req, res) {
-  res.json('hello')
+router.get('/more/get', function (req, res) {
+  res.json(req.cookie)
 })
 
 app.use(router)
